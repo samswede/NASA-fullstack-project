@@ -1,12 +1,18 @@
+// import the built-in middleware.
 const path = require('path');
 const express = require('express');
 
+// import 3rd party middleware.
 const cors = require('cors');
 const morgan = require('morgan');
 
+// import the routers.
 const planetsRouter = require('./routes/planets/planets.router');
+const launchesRouter = require('./routes/launches/launches.router');
 
+// create the express app.
 const app = express();
+
 
 
 // enable ALL CORS requests.
@@ -39,7 +45,26 @@ app.use(morgan(morganSetting));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// mount the routers. 
+/* NOTE:
+        It does not matter what order we mount the routers.
+        Because they will be matching against different routes,
+        under different paths, so it doesn't matter which order
+        we mount them in, relative to each other.
+
+        Important part is we set up the routes correctly in the
+        routers themselves.
+*/
 app.use(planetsRouter);
+app.use(launchesRouter);
+
+// mount the root route.
+/* NOTE: 
+        This is mounting the public/index.html file, which
+        is the React app after it has been built.
+        We want to serve this file at the '/' route,
+        rather than the '/index.html' route.
+*/
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
