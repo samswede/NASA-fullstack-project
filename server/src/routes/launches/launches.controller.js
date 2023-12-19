@@ -49,7 +49,21 @@ function httpGetAllLaunches(req, res) {
 function httpAddNewLaunch(req, res) {
     const launch = req.body;
 
+    // Validation
+    // If any of the required fields are missing, return a 400 response.
+    if (!launch.mission || !launch.rocket || !launch.launchDate || !launch.destination) {
+        return res.status(400).json({
+            error: 'Missing required launch property.',
+        });
+    }
     launch.launchDate = new Date(launch.launchDate);
+
+    // Validate date.
+    if (isNaN(launch.launchDate)) {
+        return res.status(400).json({
+            error: 'Invalid launch date.',
+        });
+    }
 
     addNewLaunch(launch);
 
