@@ -64,8 +64,18 @@ app.use(launchesRouter);
         is the React app after it has been built.
         We want to serve this file at the '/' route,
         rather than the '/index.html' route.
+
+        We also include '*' as the route, so that any
+        route that is not matched by the other routes
+        will be matched by this route, and the index.html
+        file will be served.
+
+        This is important, because we want to serve the
+        index.html file for all routes that are not
+        matched by the other routes, so that the React
+        app can handle those routes.
 */
-app.get('/', (req, res) => {
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
