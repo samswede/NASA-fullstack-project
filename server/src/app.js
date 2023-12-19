@@ -1,6 +1,8 @@
 const path = require('path');
 const express = require('express');
+
 const cors = require('cors');
+const morgan = require('morgan');
 
 const planetsRouter = require('./routes/planets/planets.router');
 
@@ -29,6 +31,9 @@ var corsOptions = {
 app.use(cors(corsOptions));
 */
 
+// logging usng morgan, using the 'combined' format.
+const morganSetting = 'combined' // 'dev' or 'tiny' or 'common' or 'combined'
+app.use(morgan(morganSetting));
 
 
 app.use(express.json());
