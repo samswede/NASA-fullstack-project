@@ -55,8 +55,8 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
         Important part is we set up the routes correctly in the
         routers themselves.
 */
-app.use(planetsRouter);
-app.use(launchesRouter);
+app.use('/planets', planetsRouter);
+app.use('/launches', launchesRouter);
 
 // mount the root route.
 /* NOTE: 

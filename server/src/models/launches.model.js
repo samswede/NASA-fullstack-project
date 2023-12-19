@@ -4,8 +4,10 @@
 
 const launches = new Map();
 
+let latestFlightNumber = 100;
+
 const launch = {
-    flightNumber: 100,
+    flightNumber: latestFlightNumber,
     mission: 'Kepler Exploration X',
     rocket: 'Explorer IS1',
     launchDate: new Date('December 27, 2030'),
@@ -34,6 +36,31 @@ function getAllLaunches() {
     return Array.from(launches.values());
 }
 
+function addNewLaunch(launch) {
+    /*
+    We want to minimise the amount of data that is exposed to the outside world.
+    We want the client not to have to worry about the flightNumber, for example.
+    We want to hide the implementation details from the client.
+
+    So we will assign the flightNumber in the server, not the client.
+    As well as other fields that can be derived from the data or context.
+
+    In this case, that includes the flightNumber, the upcoming field, and the success field, and the customers field.
+    */
+
+    latestFlightNumber++; // increment the flight number by 1.
+    launches.set(
+        latestFlightNumber,
+        Object.assign(launch, {
+            flightNumber: latestFlightNumber,
+            upcoming: true,
+            customers: ['ZTM', 'NASA'],
+            success: true,
+        })
+    );
+}
+
 module.exports = {
     getAllLaunches,
-};
+    addNewLaunch,
+}; 
