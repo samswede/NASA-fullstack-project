@@ -26,6 +26,27 @@ const launch = {
 // Same goes for the value. It can be any data type.
 launches.set(launch.flightNumber, launch);
 
+
+function existsLaunchWithId(launchId) {
+    return launches.has(launchId);
+}
+
+function abortLaunchById(launchId) {
+    /*
+    We could have done
+    launches.delete(launchId);
+    but we are in the era of big data and machine learning.
+    We want to keep the data for future analysis.
+    So we will just update the launch object.
+    */
+    const aborted = launches.get(launchId);
+
+    aborted.upcoming = false;
+    aborted.success = false;
+
+    return aborted;
+}
+
 // This abstraction is not necessary, but it is a good practice.
 // This way, the rest of the application does not need to know about the map.
 // We can just return the values of the map as an array.
@@ -61,6 +82,9 @@ function addNewLaunch(launch) {
 }
 
 module.exports = {
+    existsLaunchWithId,
+    abortLaunchById,
     getAllLaunches,
     addNewLaunch,
+    
 }; 
