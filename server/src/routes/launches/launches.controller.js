@@ -51,7 +51,7 @@ function httpAddNewLaunch(req, res) {
 
     // Validation
     // If any of the required fields are missing, return a 400 response.
-    if (!launch.mission || !launch.rocket || !launch.launchDate || !launch.destination) {
+    if (!launch.mission || !launch.rocket || !launch.launchDate || !launch.target) {
         return res.status(400).json({
             error: 'Missing required launch property.',
         });

@@ -15,9 +15,25 @@ async function httpGetLaunches() {
   return fetchedLaunches.sort((a, b) => a.flightNumber - b.flightNumber);
 }
 
+// Submit given launch data to launch system.
 async function httpSubmitLaunch(launch) {
-  // TODO: Once API is ready.
-  // Submit given launch data to launch system.
+  // fetch uses the GET method by default, so we need to specify the POST method.
+  // We also need to specify the Content-Type header, so that the server knows what kind of data we are sending.
+  // We also need to stringify the data, because fetch only accepts strings.
+  try {
+    return await fetch(`${API_URL}/launches`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(launch),
+    });
+  } catch (err) {
+    return {
+      ok: false,
+    };
+  }
+  
 }
 
 async function httpAbortLaunch(id) {
