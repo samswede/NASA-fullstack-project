@@ -29,15 +29,106 @@ We imported our app from server/src/app.js
 */
 
 
+/*
+// Verson 1
+describe('Test GET /launches', () => {
+    test('It should respond with 200 success', async () => {
+        const response = await request(app)
+            .get('/launches');
+        expect(response.statusCode).toBe(200);
+    });
+});
+*/
+
+// Version 2
 describe('Test GET /launches', () => {
     test('It should respond with 200 success', async () => {
         const response = await request(app)
             .get('/launches')
-            .expect('Content-Type', /json/)
+            .expect('Content-Type', /json/) // we expect the response to be JSON, the second part (/json/) is in regex format
             .expect(200);
     });
 });
 
+//==================================================================================================
+// POST
+//==================================================================================================
+
+// Version 1
+/*
+describe('Test POST /launches', () => {
+    test('It should respond with 201 created', async () => {
+        const response = await request(app)
+            .post('/launches')
+            .send({
+                mission: 'USS Enterprise',
+                rocket: 'NCC 1701-D',
+                target: 'Kepler-62 f',
+                launchDate: 'January 4, 2028',
+            })
+            .expect('Content-Type', /json/) // we expect the response to be JSON, the second part (/json/) is in regex format
+            .expect(201);
+
+        // here we will check the body of the response
+        // using jest assertions
+        // https://jestjs.io/docs/en/expect
+
+        // !!!!
+        // This does not work because the launchDate is a string
+        // the next version will deal with this
+
+        expect(response.body).toMatchObject({
+            mission: 'USS Enterprise',
+            rocket: 'NCC 1701-D',
+            target: 'Kepler-62 f',
+            launchDate: 980220400000, 
+        });
+    });
+});
+*/
+
+// Version 2
+describe('Test POST /launches', () => {
+
+    // !!! This is new !!!
+    // We add the data we will use in multiple tests to the describe block
+    // This way we don't have to repeat ourselves
+
+    const completeLaunchData = {
+        mission: 'USS Enterprise',
+        rocket: 'NCC 1701-D',
+        target: 'Kepler-62 f',
+        launchDate: 'January 4, 2028',
+    };
+
+    const launchDataWithoutDate = {
+        mission: 'USS Enterprise',
+        rocket: 'NCC 1701-D',
+        target: 'Kepler-62 f',
+    };
+    
+
+    test('It should respond with 201 created', async () => {
+
+        const response = await request(app)
+            .post('/launches')
+            .send(completeLaunchData)
+            .expect('Content-Type', /json/)
+            .expect(201);
+
+        // here we will check the body of the response
+        // using jest assertions
+        // https://jestjs.io/docs/en/expect
+
+        // !!!! This is new !!!!
+        // Because dates are tricky, we will convert the dates to numbers in same format
+        const requestDate = new Date(completeLaunchData.launchDate).valueOf();
+        const responseDate = new Date(response.body.launchDate).valueOf();
+        expect(responseDate).toBe(requestDate);
+
+        expect(response.body).toMatchObject(launchDataWithoutDate);
+    });
+});
 /*
 describe('Test POST /launches', () => {
     const completeLaunchData = {
