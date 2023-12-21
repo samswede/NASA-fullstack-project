@@ -1,6 +1,6 @@
 const { getAllPlanets } = require('../../models/planets.model');
 
-function httpGetAllPlanets(req, res) {
+async function httpGetAllPlanets(req, res) {
     /*
     Note that we are using return here, but its not necessary.
     We are using it here to stop the function from executing
@@ -19,7 +19,7 @@ function httpGetAllPlanets(req, res) {
 
     Prevents difficult to debug errors.
     */
-    return res.status(200).json(getAllPlanets());
+    return res.status(200).json(await getAllPlanets());
 }
 
 module.exports = {

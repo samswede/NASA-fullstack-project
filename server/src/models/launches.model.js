@@ -1,6 +1,7 @@
 // Why are we using a map instead of an array?
 // https://stackoverflow.com/questions/500504/why-use-a-map-over-an-object-in-javascript
 // 
+//const launches = require('./launches.mongo');
 
 const launches = new Map();
 

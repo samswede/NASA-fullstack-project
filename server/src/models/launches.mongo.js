@@ -68,3 +68,9 @@ const launchesSchema = new mongoose.Schema({
         default: true
     },
 });
+
+
+// connect schema to model
+module.exports = mongoose.model('Launch', launchesSchema);
+// NOTE: the first argument above, currently 'Launch', should always be the singular version. e.g. launches -> launch
+
