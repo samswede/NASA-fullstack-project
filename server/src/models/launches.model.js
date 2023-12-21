@@ -3,6 +3,8 @@
 // 
 const launches = require('./launches.mongo');
 
+// this is just used for validation
+const planets = require('./planets.mongo');
 
 
 let latestFlightNumber = 100;
@@ -66,9 +68,19 @@ async function getAllLaunches() {
 }
 
 async function saveLaunch(launch) {
+    
     try {
+        // We want to make sure that the planet exists in the collection before we save the launch.
+        const planet = await planets.findOne({
+            keplerName: launch.target,
+            });
+
+        if (!planet) {
+            throw new Error('No matching planet was found');
+        }
+
         await launches.updateOne({
-            flightNumber: launch.latestFlightNumber,
+            flightNumber: launch.flightNumber,
           }, 
           launch,
           {
