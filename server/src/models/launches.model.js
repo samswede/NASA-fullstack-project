@@ -58,8 +58,11 @@ function abortLaunchById(launchId) {
 // The Array.from() method creates a new, shallow-copied Array instance from an array-like or iterable object.
 // map.values is an iterable object.
 // Then we can return the List of launches as a JSON object.
-function getAllLaunches() {
+async function getAllLaunches() {
+    /*
     return Array.from(launches.values());
+    */
+    return await launches.find({}, { '_id': 0, '__v': 0 }); // exclude the _id and __v fields
 }
 
 async function saveLaunch(launch) {
