@@ -1,9 +1,9 @@
 // Why are we using a map instead of an array?
 // https://stackoverflow.com/questions/500504/why-use-a-map-over-an-object-in-javascript
 // 
-//const launches = require('./launches.mongo');
+const launches = require('./launches.mongo');
 
-const launches = new Map();
+
 
 let latestFlightNumber = 100;
 
@@ -18,6 +18,9 @@ const launch = {
     success: true,
 };
 
+saveLaunch(launch);
+/*
+const launches = new Map();
 // How do we add a new launch to our map?
 // We use the set method.
 // map.set(key, value); where key is the flightNumber and value is the launch object.
@@ -25,8 +28,9 @@ const launch = {
 // In this case, the key is the flightNumber, which is a number.
 // But it could be a string, an object, an array, or even a function!
 // Same goes for the value. It can be any data type.
-launches.set(launch.flightNumber, launch);
 
+launches.set(launch.flightNumber, launch);
+*/
 
 function existsLaunchWithId(launchId) {
     return launches.has(launchId);
@@ -56,6 +60,22 @@ function abortLaunchById(launchId) {
 // Then we can return the List of launches as a JSON object.
 function getAllLaunches() {
     return Array.from(launches.values());
+}
+
+async function saveLaunch(launch) {
+    try {
+        await launches.updateOne({
+            flightNumber: launch.latestFlightNumber,
+          }, 
+          launch,
+          {
+          upsert: true,
+          },
+        )
+    
+      } catch(err) {
+        console.error(`Could not save planet because: ${err}`);
+      }
 }
 
 function addNewLaunch(launch) {
