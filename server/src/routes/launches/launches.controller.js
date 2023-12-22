@@ -40,7 +40,7 @@ module.exports = {
 // rest of the application does not need to know about.
 
 const { getAllLaunches,
-        addNewLaunch,
+        scheduleNewLaunch,
         abortLaunchById,
         existsLaunchWithId } = require('../../models/launches.model');
 
@@ -48,7 +48,7 @@ async function httpGetAllLaunches(req, res) {
     return res.status(200).json(await getAllLaunches());
 }
 
-function httpAddNewLaunch(req, res) {
+async function httpAddNewLaunch(req, res) {
     const launch = req.body;
 
     // Validation
@@ -67,7 +67,8 @@ function httpAddNewLaunch(req, res) {
         });
     }
 
-    addNewLaunch(launch);
+    //addNewLaunch(launch);
+    await scheduleNewLaunch(launch);
 
     return res.status(201).json(launch);
 }

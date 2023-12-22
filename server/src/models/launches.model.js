@@ -7,10 +7,11 @@ const launches = require('./launches.mongo');
 const planets = require('./planets.mongo');
 
 
-let latestFlightNumber = 100;
+//let latestFlightNumber = 100;
+const DEFAULT_FLIGHT_NUMBER = 100;
 
 const launch = {
-    flightNumber: latestFlightNumber,
+    flightNumber: DEFAULT_FLIGHT_NUMBER,
     mission: 'Kepler Exploration X',
     rocket: 'Explorer IS1',
     launchDate: new Date('December 27, 2030'),
@@ -36,6 +37,18 @@ launches.set(launch.flightNumber, launch);
 
 function existsLaunchWithId(launchId) {
     return launches.has(launchId);
+}
+
+async function getLatestFlightNumber() {
+    const latestLaunch = await launches
+        .findOne()
+        .sort('-flightNumber');
+
+    if (!latestLaunch) {
+        return DEFAULT_FLIGHT_NUMBER;
+    }
+
+    return latestLaunch.flightNumber;
 }
 
 function abortLaunchById(launchId) {
@@ -93,6 +106,28 @@ async function saveLaunch(launch) {
       }
 }
 
+async function scheduleNewLaunch(launch) {
+    const planet = await planets.findOne({
+        keplerName: launch.target,
+        });
+
+    if (!planet) {
+        throw new Error('No matching planet was found');
+    }
+
+    const newFlightNumber = await getLatestFlightNumber() + 1;
+
+    const newLaunch = Object.assign(launch, {
+        success: true,
+        upcoming: true,
+        customers: ['ZTM', 'NASA'],
+        flightNumber: newFlightNumber,
+    });
+
+    await saveLaunch(newLaunch);
+}
+
+
 function addNewLaunch(launch) {
     /*
     We want to minimise the amount of data that is exposed to the outside world.
@@ -117,10 +152,12 @@ function addNewLaunch(launch) {
     );
 }
 
+
 module.exports = {
     existsLaunchWithId,
     abortLaunchById,
     getAllLaunches,
-    addNewLaunch,
+    //addNewLaunch,
+    scheduleNewLaunch,
     
 }; 
