@@ -27,11 +27,15 @@ saveLaunch(launch);
 
 const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query"
 
-async function loadLaunchesData() {
+
+
+async function populateLaunches() {
+
     console.log('Downloading launch data...');
     const response = await axios.post(SPACEX_API_URL, {
         query: {},
         options: {
+                pagination: false,
                 populate: [
                         {
                             path: 'rocket',
@@ -49,6 +53,50 @@ async function loadLaunchesData() {
         }
     })
 
+    if (!response.ok) { // if not work, then use: (!response.status === 200)
+        console.log('Problem downloading launch data');
+        throw new Error('Launch data download failed');
+    }
+
+    const launchDocs = response.data.docs;
+
+    for (const launchDoc of launchDocs) {
+        const payloads = launchDoc.payloads;
+        const customers = payloads.flatMap((payload) => {
+            return payload.customers;
+        });
+
+        const flightData = {
+            flightNumber: launchDoc.flight_number,
+            mission: launchDoc.name,
+            rocket: launchDoc.rocket.name,
+            launchDate: launchDoc.date_local,
+            upcoming: launchDoc.upcoming,
+            success: launchDoc.success,
+            customers: customers,
+
+            //target: 'Kepler-442 b', // not applicable, but needed to pass validation
+        };
+
+        console.log(`${flightData.flightNumber} ${flightData.mission}`);
+
+        //TO DO: populate launches collection
+        //await saveLaunch(flightData);
+    }
+};
+
+async function loadLaunchData() {
+    const firstLaunch = await findLaunch({
+        flightNumber: 1,
+        rocket: 'Falcon 1',
+        mission: 'FalconSat',
+    })
+
+    if (firstLaunch) {
+        console.log('Launch data already loaded!');
+    } else {
+        await populateLaunches();
+    }
 }
 
 /*
@@ -101,11 +149,15 @@ const launches = new Map();
 launches.set(launch.flightNumber, launch);
 */
 
+async function findLaunch(filter) {
+    return await launches.findOne(filter);
+};
+
 async function existsLaunchWithId(launchId) {
-    return await launches.findOne({
+    return await findLaunch({
         flightNumber: launchId,
     });
-}
+};
 
 async function getLatestFlightNumber() {
     const latestLaunch = await launches
@@ -157,7 +209,18 @@ async function getAllLaunches() {
 }
 
 async function saveLaunch(launch) {
-    
+
+    await launches.findOneAndUpdate({
+        flightNumber: launch.flightNumber,
+        }, 
+        launch,
+        {
+        upsert: true,
+        },
+    );
+}
+
+async function scheduleNewLaunch(launch) {
     try {
         // We want to make sure that the planet exists in the collection before we save the launch.
         const planet = await planets.findOne({
@@ -168,39 +231,20 @@ async function saveLaunch(launch) {
             throw new Error('No matching planet was found');
         }
 
-        await launches.findOneAndUpdate({
-            flightNumber: launch.flightNumber,
-          }, 
-          launch,
-          {
-          upsert: true,
-          },
-        )
-    
-      } catch(err) {
-        console.error(`Could not save planet because: ${err}`);
-      }
-}
+        const newFlightNumber = await getLatestFlightNumber() + 1;
 
-async function scheduleNewLaunch(launch) {
-    const planet = await planets.findOne({
-        keplerName: launch.target,
+        const newLaunch = Object.assign(launch, {
+            success: true,
+            upcoming: true,
+            customers: ['ZTM', 'NASA'],
+            flightNumber: newFlightNumber,
         });
 
-    if (!planet) {
-        throw new Error('No matching planet was found');
-    }
+        await saveLaunch(newLaunch);
 
-    const newFlightNumber = await getLatestFlightNumber() + 1;
-
-    const newLaunch = Object.assign(launch, {
-        success: true,
-        upcoming: true,
-        customers: ['ZTM', 'NASA'],
-        flightNumber: newFlightNumber,
-    });
-
-    await saveLaunch(newLaunch);
+        } catch (error) {
+            console.error(`Could not schedule launch because: ${error}`);
+        }
 }
 
 
@@ -230,7 +274,7 @@ function addNewLaunch(launch) {
 
 
 module.exports = {
-    loadLaunchesData,
+    loadLaunchData,
     existsLaunchWithId,
     abortLaunchById,
     getAllLaunches,
