@@ -82,7 +82,6 @@ async function populateLaunches() {
 
         console.log(`${flightData.flightNumber} | ${flightData.mission} | ${flightData.customers}`);
 
-        //TO DO: populate launches collection
         await saveLaunch(flightData);
     }
 };
@@ -203,11 +202,15 @@ async function abortLaunchById(launchId) {
 // The Array.from() method creates a new, shallow-copied Array instance from an array-like or iterable object.
 // map.values is an iterable object.
 // Then we can return the List of launches as a JSON object.
-async function getAllLaunches() {
+async function getAllLaunches(skip, limit) {
     /*
     return Array.from(launches.values());
     */
-    return await launches.find({}, { '_id': 0, '__v': 0 }); // exclude the _id and __v fields
+    return await launches
+        .find({}, { '_id': 0, '__v': 0 }) // exclude the _id and __v fields
+        .sort({ flightNumber: 1 }) // sort in ascending order by flightNumber
+        .skip(skip) // skip the first n elements
+        .limit(limit); // limit the number of elements returned
 }
 
 async function saveLaunch(launch) {
