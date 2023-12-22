@@ -52,8 +52,8 @@ const launchesSchema = new mongoose.Schema({
 
     target: {
         type: String,
-        required: true,
-        default: 'Earth'
+        required: false,
+        default: 'NOT SPECIFIED'
     },
 
     upcoming: {
@@ -66,6 +66,12 @@ const launchesSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: true
+    },
+
+    customers: {
+        type: [String],
+        required: false,
+        default: ['NOT SPECIFIED']
     },
 });
 

@@ -12,6 +12,7 @@ const planets = require('./planets.mongo');
 //let latestFlightNumber = 100;
 const DEFAULT_FLIGHT_NUMBER = 100;
 
+/*
 const launch = {
     flightNumber: DEFAULT_FLIGHT_NUMBER,        // flight_number
     mission: 'Kepler Exploration X',            // name
@@ -22,8 +23,8 @@ const launch = {
     upcoming: true,                             // upcoming
     success: true,                              // success
 };
-
-saveLaunch(launch);
+*/
+//saveLaunch(launch);
 
 const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query"
 
@@ -53,7 +54,7 @@ async function populateLaunches() {
         }
     })
 
-    if (!response.ok) { // if not work, then use: (!response.status === 200)
+    if (!response.status === 200) { 
         console.log('Problem downloading launch data');
         throw new Error('Launch data download failed');
     }
@@ -66,6 +67,8 @@ async function populateLaunches() {
             return payload.customers;
         });
 
+        console.log(customers); // this works...
+
         const flightData = {
             flightNumber: launchDoc.flight_number,
             mission: launchDoc.name,
@@ -73,15 +76,14 @@ async function populateLaunches() {
             launchDate: launchDoc.date_local,
             upcoming: launchDoc.upcoming,
             success: launchDoc.success,
-            customers: customers,
+            customers,
 
-            //target: 'Kepler-442 b', // not applicable, but needed to pass validation
         };
 
-        console.log(`${flightData.flightNumber} ${flightData.mission}`);
+        console.log(`${flightData.flightNumber} | ${flightData.mission} | ${flightData.customers}`);
 
         //TO DO: populate launches collection
-        //await saveLaunch(flightData);
+        await saveLaunch(flightData);
     }
 };
 
