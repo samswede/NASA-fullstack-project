@@ -31,7 +31,8 @@ We imported our app from server/src/app.js
 /*
 We need to connect to the database before we run our tests
 */
-const { mongoConnect } = require('../../services/mongo');
+const { mongoConnect,
+        mongoDisconnect } = require('../../services/mongo');
 
 /*
 Where will we connect to the database? We will use a feature of Jest
@@ -63,6 +64,11 @@ describe('Test Launches API', () => {
     // set up test environment once
     beforeAll(async () => {
         await mongoConnect();
+    });
+
+    // tear down test environment once
+    afterAll(async () => {
+        await mongoDisconnect();
     });
 
     // Version 2
