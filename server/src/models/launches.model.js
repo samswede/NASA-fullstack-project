@@ -35,8 +35,10 @@ const launches = new Map();
 launches.set(launch.flightNumber, launch);
 */
 
-function existsLaunchWithId(launchId) {
-    return launches.has(launchId);
+async function existsLaunchWithId(launchId) {
+    return await launches.findOne({
+        flightNumber: launchId,
+    });
 }
 
 async function getLatestFlightNumber() {
@@ -51,7 +53,7 @@ async function getLatestFlightNumber() {
     return latestLaunch.flightNumber;
 }
 
-function abortLaunchById(launchId) {
+async function abortLaunchById(launchId) {
     /*
     We could have done
     launches.delete(launchId);
@@ -59,12 +61,20 @@ function abortLaunchById(launchId) {
     We want to keep the data for future analysis.
     So we will just update the launch object.
     */
-    const aborted = launches.get(launchId);
+    //const aborted = launches.get(launchId);
+    const aborted = await launches.updateOne({
+        flightNumber: launchId,
+    }, {
+        upcoming: false,
+        success: false,
+    });
+    // note that we are not using upsert = true here.
+    // because we don't want to create a new launch if it doesn't exist.
+    // we only want to update an existing launch.
+    // and we know that the launch exists because we checked it in the existsLaunchWithId function.
 
-    aborted.upcoming = false;
-    aborted.success = false;
-
-    return aborted;
+    successfullyAborted = (aborted.modifiedCount === 1); // modifiedCount is a property of the result object
+    return successfullyAborted;
 }
 
 // This abstraction is not necessary, but it is a good practice.
