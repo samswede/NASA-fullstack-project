@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 // this is from the MongoDB Atlas website, where we created our database
 // under the "Connect" button, we chose the driver "Node.js".
 // replace the <password> with the password we created for the database user
-const password = 'testing123';
-const databaseName = 'space-explorer'; // will be created if it doesn't exist
+const password = process.env.MONGO_DATABASE_PASSWORD;
+const databaseName = process.env.MONGO_DATABASE_NAME; // will be created if it doesn't exist
 const MONGO_URL = `mongodb+srv://samuelandersson:${password}@cluster0.cdvhawq.mongodb.net/${databaseName}?retryWrites=true&w=majority`;
 
 // this is the new way of connecting to MongoDB
