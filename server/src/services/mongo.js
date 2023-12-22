@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+// this is only added here for our tests to work
+require('dotenv').config();
+
 // set up MongoDB connection
 // this is from the MongoDB Atlas website, where we created our database
 // under the "Connect" button, we chose the driver "Node.js".
