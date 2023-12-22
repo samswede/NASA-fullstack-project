@@ -1,6 +1,8 @@
 // Why are we using a map instead of an array?
 // https://stackoverflow.com/questions/500504/why-use-a-map-over-an-object-in-javascript
 // 
+const axios = require('axios');
+
 const launches = require('./launches.mongo');
 
 // this is just used for validation
@@ -11,17 +13,81 @@ const planets = require('./planets.mongo');
 const DEFAULT_FLIGHT_NUMBER = 100;
 
 const launch = {
-    flightNumber: DEFAULT_FLIGHT_NUMBER,
-    mission: 'Kepler Exploration X',
-    rocket: 'Explorer IS1',
-    launchDate: new Date('December 27, 2030'),
-    target: 'Kepler-442 b',
-    customers: ['ZTM', 'NASA'],
-    upcoming: true,
-    success: true,
+    flightNumber: DEFAULT_FLIGHT_NUMBER,        // flight_number
+    mission: 'Kepler Exploration X',            // name
+    rocket: 'Explorer IS1',                     // rocket.name
+    launchDate: new Date('December 27, 2030'),  // date_local
+    target: 'Kepler-442 b',                     // not applicable
+    customers: ['ZTM', 'NASA'],                 // payloads.customers for each payload
+    upcoming: true,                             // upcoming
+    success: true,                              // success
 };
 
 saveLaunch(launch);
+
+const SPACEX_API_URL = "https://api.spacexdata.com/v4/launches/query"
+
+async function loadLaunchesData() {
+    console.log('Downloading launch data...');
+    const response = await axios.post(SPACEX_API_URL, {
+        query: {},
+        options: {
+                populate: [
+                        {
+                            path: 'rocket',
+                            select: {
+                                name: 1
+                            }
+                        },
+                        {
+                            path: 'payloads',
+                            select: {
+                                customers: 1
+                            }
+                        }
+                ]
+        }
+    })
+
+}
+
+/*
+async function populateLaunches() {
+    console.log('Downloading launch data...');
+    const response = await fetch('https://api.spacexdata.com/v3/launches', {
+        method: 'GET',
+    });
+
+    if (!response.ok) {
+        console.log('Problem downloading launch data');
+        throw new Error('Launch data download failed');
+    }
+
+    const launchData = await response.json();
+    //console.log(launchData);
+
+    for (const launch of launchData) {
+        const payloads = launch.rocket.second_stage.payloads;
+        const customers = payloads.flatMap((payload) => {
+            return payload.customers;
+        });
+
+        const flightData = {
+            flightNumber: launch.flight_number,
+            mission: launch.mission_name,
+            rocket: launch.rocket.rocket_name,
+            launchDate: launch.launch_date_unix,
+            upcoming: launch.upcoming,
+            success: launch.launch_success,
+            customers,
+        };
+
+        console.log(`${flightData.flightNumber} ${flightData.mission}`);
+
+        await saveLaunch(flightData);
+    }
+};
+*/
 /*
 const launches = new Map();
 // How do we add a new launch to our map?
@@ -164,6 +230,7 @@ function addNewLaunch(launch) {
 
 
 module.exports = {
+    loadLaunchesData,
     existsLaunchWithId,
     abortLaunchById,
     getAllLaunches,
