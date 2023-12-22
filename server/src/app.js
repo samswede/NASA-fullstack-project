@@ -6,9 +6,9 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 
-// import the routers.
-const planetsRouter = require('./routes/planets/planets.router');
-const launchesRouter = require('./routes/launches/launches.router');
+// import own api router.
+const api = require('./routes/api');
+
 
 // create the express app.
 const app = express();
@@ -44,19 +44,8 @@ app.use(morgan(morganSetting));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// mount the routers. 
-/* NOTE:
-        It does not matter what order we mount the routers.
-        Because they will be matching against different routes,
-        under different paths, so it doesn't matter which order
-        we mount them in, relative to each other.
-
-        Important part is we set up the routes correctly in the
-        routers themselves.
-*/
-
-app.use('/planets', planetsRouter);
-app.use('/launches', launchesRouter);
+// mount the v1 of api router.
+app.use('/v1', api);
 
 // mount the root route.
 /* NOTE: 
