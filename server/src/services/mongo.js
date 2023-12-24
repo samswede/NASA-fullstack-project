@@ -11,11 +11,11 @@ require('dotenv').config();
 let MONGO_URL;
 
 if (process.env.MONGO_URL) {
-    
+    //this is active for testing in the CI/CD pipeline
     MONGO_URL = process.env.MONGO_URL
 
 } else {
-
+    //this is active for local testing and development
     const password = process.env.MONGO_DATABASE_PASSWORD;
     const databaseName = process.env.MONGO_DATABASE_NAME; // will be created if it doesn't exist
     MONGO_URL = `mongodb+srv://samuelandersson:${password}@cluster0.cdvhawq.mongodb.net/${databaseName}?retryWrites=true&w=majority`;
