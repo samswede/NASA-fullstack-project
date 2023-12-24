@@ -10,7 +10,7 @@ require('dotenv').config();
 
 let MONGO_URL;
 
-if (!process.env.MONGO_URL) {
+if (process.env.MONGO_URL) {
     
     MONGO_URL = process.env.MONGO_URL
 
