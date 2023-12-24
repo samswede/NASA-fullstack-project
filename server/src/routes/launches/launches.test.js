@@ -33,6 +33,8 @@ We need to connect to the database before we run our tests
 */
 const { mongoConnect,
         mongoDisconnect } = require('../../services/mongo');
+// and be able to populate the test database with data
+const { loadPlanetsData } = require('../../models/planets.model');
 
 /*
 Where will we connect to the database? We will use a feature of Jest
@@ -64,6 +66,7 @@ describe('Test Launches API', () => {
     // set up test environment once
     beforeAll(async () => {
         await mongoConnect();
+        await loadPlanetsData();
     });
 
     // tear down test environment once
