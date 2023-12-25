@@ -1,4 +1,9 @@
+/*
+// before we were using docker...
 const API_URL = 'http://localhost:8000/v1'; // v1 API route.
+*/
+// less specific when using docker...
+const API_URL = 'v1';
 
 // Load planets and return as JSON.
 async function httpGetPlanets() {
